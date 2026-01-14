@@ -67,34 +67,33 @@ async function loadBearDataFromGoogleSheets() {
             '金': '금', '土': '토', '日': '일'
         };
         
-        // API가 반환하는 모든 행 처리 (헤더 이후)
-        for (let i = 4; i < rows.length; i++) {
+        // 구조 변경 후: 1행이 헤더, 2행부터 데이터
+        // API rows 배열: 인덱스 0 = 1행 (헤더), 인덱스 1부터 = 데이터
+        for (let i = 1; i < rows.length; i++) {
             const row = rows[i];
             
-            // 빈 행 건너뛰기
             if (!row.c) continue;
             
             const cells = row.c;
             
-            // 안전한 셀 값 가져오기
             const getCellByIndex = (idx) => {
                 return cells[idx]?.v ?? null;
             };
             
-            const id = getCellByIndex(1);
-            const year = getCellByIndex(2) || 2025;
-            const month = getCellByIndex(3);
-            const day = getCellByIndex(4);
-            const weekdayJa = getCellByIndex(5);
-            const time = getCellByIndex(6);
-            const location = getCellByIndex(9);
-            const address = getCellByIndex(10);
-            const description = getCellByIndex(11);
-            const sightingTypeRaw = getCellByIndex(12);
-            const lat = getCellByIndex(14);
-            const lng = getCellByIndex(15);
+            // A열 삭제 후 컬럼 인덱스: 0부터 시작
+            const id = getCellByIndex(0);              // A열: 연번
+            const year = getCellByIndex(1) || 2025;    // B열: 연도
+            const month = getCellByIndex(2);           // C열: 월
+            const day = getCellByIndex(3);             // D열: 일
+            const weekdayJa = getCellByIndex(4);       // E열: 요일
+            const time = getCellByIndex(5);            // F열: 시간
+            const location = getCellByIndex(8);        // I열: 하위 행정
+            const address = getCellByIndex(9);         // J열: 세부 주소
+            const description = getCellByIndex(10);    // K열: 내용
+            const sightingTypeRaw = getCellByIndex(11); // L열: 목격 정보
+            const lat = getCellByIndex(13);            // N열: Latitude
+            const lng = getCellByIndex(14);            // O열: Longitude
             
-            // 좌표가 유효한 경우만 추가
             if (lat !== null && lng !== null && !isNaN(lat) && !isNaN(lng)) {
                 const weekday = weekdayMap[weekdayJa] || weekdayJa;
                 const sightingType = normalizeSightingType(sightingTypeRaw);
