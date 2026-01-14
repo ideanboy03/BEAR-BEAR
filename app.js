@@ -67,9 +67,22 @@ async function loadBearDataFromGoogleSheets() {
             '金': '금', '土': '토', '日': '일'
         };
         
-        // 구조 변경 후: 1행이 헤더, 2행부터 데이터
-        // API rows 배열: 인덱스 0 = 1행 (헤더), 인덱스 1부터 = 데이터
-        for (let i = 1; i < rows.length; i++) {
+        // 구조: API의 rows[0]이 헤더, rows[1]부터 데이터
+        // 하지만 실제로는 rows[0]도 데이터일 수 있으니 검증 필요
+        
+        // 첫 행이 헤더인지 데이터인지 확인
+        let startIndex = 0;
+        if (rows[0] && rows[0].c) {
+            const firstCell = rows[0].c[0]?.v;
+            // 첫 셀이 "연번" 같은 텍스트면 헤더
+            if (firstCell && (typeof firstCell === 'string' || firstCell === '연번')) {
+                startIndex = 1;
+            }
+        }
+        
+        console.log('데이터 시작 인덱스:', startIndex);
+        
+        for (let i = startIndex; i < rows.length; i++) {
             const row = rows[i];
             
             if (!row.c) continue;
