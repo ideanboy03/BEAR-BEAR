@@ -40,6 +40,31 @@ function normalizeSightingType(type) {
     return '곰 목격';
 }
 
+// 안전한 셀 값 가져오기 (컬럼 레이블 기반)
+function getCellValue(row, columnLabel) {
+    if (!row.c) return null;
+    
+    for (let cell of row.c) {
+        if (cell && cell.p && cell.p.column_label === columnLabel) {
+            return cell.v;
+        }
+    }
+    
+    // 폴백: 인덱스 기반
+    const columnMap = {
+        'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5, 'G': 6,
+        'H': 7, 'I': 8, 'J': 9, 'K': 10, 'L': 11, 'M': 12,
+        'N': 13, 'O': 14, 'P': 15
+    };
+    
+    const index = columnMap[columnLabel];
+    if (index !== undefined && row.c[index]) {
+        return row.c[index].v;
+    }
+    
+    return null;
+}
+
 // 지도 초기화
 function initMap() {
     map = L.map('map').setView([43.0642, 141.3469], 11);
@@ -69,29 +94,36 @@ async function loadBearDataFromGoogleSheets() {
             '金': '금', '土': '토', '日': '일'
         };
         
+        console.log(`총 ${rows.length}개 행 처리`);
+        
         // 5번 행(인덱스 4)부터 데이터 시작
-        // 4번 행(인덱스 3)은 헤더
         for (let i = 4; i < rows.length; i++) {
             const row = rows[i];
             if (!row.c) continue;
             
+            // 인덱스 기반으로 직접 접근 (더 안전)
             const cells = row.c;
             
-            // A열 공란, B열부터 데이터
-            const id = cells[1]?.v;              // B열: 연번
-            const year = cells[2]?.v || 2025;    // C열: 연도
-            const month = cells[3]?.v;           // D열: 월
-            const day = cells[4]?.v;             // E열: 일
-            const weekdayJa = cells[5]?.v;       // F열: 요일
-            const time = cells[6]?.v;            // G열: 시간
-            const location = cells[9]?.v;        // J열: 하위 행정
-            const address = cells[10]?.v;        // K열: 세부 주소
-            const description = cells[11]?.v;    // L열: 내용
-            const sightingTypeRaw = cells[12]?.v; // M열: 목격 정보
-            const lat = cells[14]?.v;            // O열: Latitude
-            const lng = cells[15]?.v;            // P열: Longitude
+            // cells 배열을 최대 길이까지 확장 (빈 셀 처리)
+            const getCellByIndex = (idx) => {
+                return cells[idx]?.v ?? null;
+            };
             
-            if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
+            const id = getCellByIndex(1);       // B열
+            const year = getCellByIndex(2) || 2025; // C열
+            const month = getCellByIndex(3);    // D열
+            const day = getCellByIndex(4);      // E열
+            const weekdayJa = getCellByIndex(5); // F열
+            const time = getCellByIndex(6);     // G열
+            const location = getCellByIndex(9); // J열
+            const address = getCellByIndex(10); // K열
+            const description = getCellByIndex(11); // L열
+            const sightingTypeRaw = getCellByIndex(12); // M열
+            const lat = getCellByIndex(14);     // O열
+            const lng = getCellByIndex(15);     // P열
+            
+            // 좌표 유효성 검사
+            if (lat !== null && lng !== null && !isNaN(lat) && !isNaN(lng)) {
                 const weekday = weekdayMap[weekdayJa] || weekdayJa;
                 const sightingType = normalizeSightingType(sightingTypeRaw);
                 
@@ -115,6 +147,10 @@ async function loadBearDataFromGoogleSheets() {
         filteredData = [...allBearData];
         
         console.log(`✓ ${allBearData.length}건의 곰 출몰 데이터 로드 완료`);
+        
+        if (allBearData.length < 363) {
+            console.warn(`⚠️ 예상 데이터: 363건, 실제 로드: ${allBearData.length}건`);
+        }
         
         updateMarkers();
         updateDynamicStats();
