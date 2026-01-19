@@ -471,21 +471,15 @@ function applyFilters() {
         }
 
         if (currentHour === -1) {
-            // 시간 불명: time 필드에 '時間不明'이 포함된 경우만
-            // Date 객체는 시간이 있는 것으로 간주
-            const timeStr = bear.time ? bear.time.toString() : '';
-            const isDateObject = timeStr.startsWith('Date(');
-            const hasTimeUnknown = timeStr.includes('時間不明') || timeStr.includes('시간 불명');
-            
-            if (isDateObject || !hasTimeUnknown) {
+            // 시간 불명: time 필드가 null이거나 빈 문자열인 데이터만 표시
+            if (bear.time && bear.time.toString().trim() !== '') {
+                // 시간 정보가 있으면 제외
                 matches = false;
             }
         } else if (currentHour !== null) {
-            // 특정 시간대 필터
-            const timeStr = bear.time ? bear.time.toString() : '';
-            
-            // 時間不明이 포함되어 있으면 제외
-            if (timeStr.includes('時間不明') || timeStr.includes('시간 불명')) {
+            // 특정 시간대 필터: 해당 시간대의 데이터만 표시
+            if (!bear.time || bear.time.toString().trim() === '') {
+                // 시간 정보가 없으면 제외
                 matches = false;
             } else {
                 const bearHour = extractHour(bear.time);
@@ -494,6 +488,7 @@ function applyFilters() {
                 }
             }
         }
+        // currentHour === null (전체 시간)인 경우는 모든 데이터 표시
 
         if (currentWeekday !== null && bear.weekday !== currentWeekday) {
             matches = false;
