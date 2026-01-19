@@ -471,16 +471,20 @@ function applyFilters() {
         }
 
         if (currentHour === -1) {
-            // 시간 불명: time이 null이거나 빈 문자열
-            if (bear.time && bear.time.toString().trim() !== '') {
+            // 시간 불명: time 필드에 '時間不明'이 포함된 경우
+            const timeStr = bear.time ? bear.time.toString().trim() : '';
+            if (!timeStr.includes('時間不明') && !timeStr.includes('시간 불명') && !timeStr.includes('不明')) {
                 matches = false;
             }
         } else if (currentHour !== null) {
-            if (!bear.time) {
+            // 특정 시간대 필터
+            const timeStr = bear.time ? bear.time.toString().trim() : '';
+            // 時間不明이 포함되어 있으면 제외
+            if (timeStr.includes('時間不明') || timeStr.includes('시간 불명') || timeStr.includes('不明')) {
                 matches = false;
             } else {
                 const bearHour = extractHour(bear.time);
-                if (bearHour !== currentHour) {
+                if (bearHour === null || bearHour !== currentHour) {
                     matches = false;
                 }
             }
@@ -515,6 +519,25 @@ function extractHour(timeString) {
 // 통계 업데이트
 function updateStats() {
     document.getElementById('visibleCount').textContent = filteredData.length;
+    
+    const selectedAreaElem = document.getElementById('selectedArea');
+    if (currentLocation) {
+        selectedAreaElem.innerHTML = currentLocation;
+    } else {
+        selectedAreaElem.innerHTML = `
+            <span data-lang="ko">전체</span>
+            <span data-lang="ja" style="display:none;">全て</span>
+            <span data-lang="en" style="display:none;">All</span>
+        `;
+        
+        // 언어 설정 적용
+        selectedAreaElem.querySelectorAll('[data-lang]').forEach(elem => {
+            elem.style.display = 'none';
+        });
+        selectedAreaElem.querySelectorAll(`[data-lang="${currentLanguage}"]`).forEach(elem => {
+            elem.style.display = '';
+        });
+    }
 }
 
 // 언어 변경
@@ -570,8 +593,18 @@ function updateFilterLabels(lang) {
         }
     };
 
+    const sightingTypeLabels = {
+        ko: ['전체 유형', '🐻 곰 목격', '👣 곰 흔적 확인', '🔴 곰 사살', '🐻🐻 곰 가족 목격', '⚫ 곰 추정 목격', '🤕 곰에 의한 사상'],
+        ja: ['全てのタイプ', '🐻 クマ目撃', '👣 クマ痕跡確認', '🔴 クマ駆除', '🐻🐻 クマ親子目撃', '⚫ クマ可能性', '🤕 クマによる人身事故'],
+        en: ['All Types', '🐻 Bear Sighting', '👣 Bear Tracks Found', '🔴 Bear Captured', '🐻🐻 Bear Family Sighting', '⚫ Possible Bear Sighting', '🤕 Bear Attack']
+    };
+
     locationFilter.options[0].text = labels[lang].allLocations;
-    sightingTypeFilter.options[0].text = labels[lang].allTypes;
+    
+    // 목격 정보 필터 옵션 업데이트
+    for (let i = 0; i < sightingTypeFilter.options.length; i++) {
+        sightingTypeFilter.options[i].text = sightingTypeLabels[lang][i];
+    }
     
     if (currentYear === null) {
         updateYearLabel(labels[lang].allYears, labels['ja'].allYears, labels['en'].allYears);

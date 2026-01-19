@@ -84,7 +84,7 @@
 
         .stats-bar {
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(2, 1fr);
             gap: 16px;
             margin-bottom: 20px;
         }
@@ -364,6 +364,10 @@
             #map {
                 height: 450px;
             }
+
+            .stats-bar {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -384,29 +388,23 @@
     </header>
 
     <div class="container">
-        <!-- 통계 카드 (표시 중인 출몰만) -->
+        <!-- 통계 카드 -->
         <div class="stats-bar">
             <div class="stat-card">
-                <div class="stat-label" data-lang="ko">표시 중인 출몰</div>
-                <div class="stat-label" data-lang="ja" style="display:none;">表示中の出没</div>
+                <div class="stat-label" data-lang="ko">표시 중인 출몰 건수</div>
+                <div class="stat-label" data-lang="ja" style="display:none;">表示中の出没件数</div>
                 <div class="stat-label" data-lang="en" style="display:none;">Showing Sightings</div>
                 <div class="stat-value" id="visibleCount">0</div>
             </div>
-        </div>
-
-        <!-- 적용 중인 조건 -->
-        <div class="active-filters">
-            <div class="filter-label">
-                <span data-lang="ko">적용 중인 조건</span>
-                <span data-lang="ja" style="display:none;">適用中の条件</span>
-                <span data-lang="en" style="display:none;">Active Filters</span>
-            </div>
-            <div class="filter-tags" id="filterTags">
-                <span class="filter-tag all">
+            <div class="stat-card">
+                <div class="stat-label" data-lang="ko">선택된 지역</div>
+                <div class="stat-label" data-lang="ja" style="display:none;">選択地域</div>
+                <div class="stat-label" data-lang="en" style="display:none;">Selected Area</div>
+                <div class="stat-value" id="selectedArea">
                     <span data-lang="ko">전체</span>
                     <span data-lang="ja" style="display:none;">全て</span>
                     <span data-lang="en" style="display:none;">All</span>
-                </span>
+                </div>
             </div>
         </div>
 
@@ -513,15 +511,45 @@
                 </label>
                 <div class="filter-group">
                     <select class="filter-select" id="sightingTypeFilter" onchange="applyFilters()">
-                        <option value="">전체 유형</option>
-                        <option value="곰 목격">🐻 곰 목격</option>
-                        <option value="곰 흔적 확인">👣 곰 흔적 확인</option>
-                        <option value="곰 사살">🔴 곰 사살</option>
-                        <option value="곰 가족 목격">🐻🐻 곰 가족 목격</option>
-                        <option value="곰 추정 목격">⚫ 곰 추정 목격</option>
-                        <option value="곰에 의한 사상">🤕 곰에 의한 사상</option>
+                        <option value="">
+                            <span data-ko="전체 유형" data-ja="全てのタイプ" data-en="All Types">전체 유형</span>
+                        </option>
+                        <option value="곰 목격">
+                            <span data-ko="🐻 곰 목격" data-ja="🐻 クマ目撃" data-en="🐻 Bear Sighting">🐻 곰 목격</span>
+                        </option>
+                        <option value="곰 흔적 확인">
+                            <span data-ko="👣 곰 흔적 확인" data-ja="👣 クマ痕跡確認" data-en="👣 Bear Tracks Found">👣 곰 흔적 확인</span>
+                        </option>
+                        <option value="곰 사살">
+                            <span data-ko="🔴 곰 사살" data-ja="🔴 クマ駆除" data-en="🔴 Bear Captured">🔴 곰 사살</span>
+                        </option>
+                        <option value="곰 가족 목격">
+                            <span data-ko="🐻🐻 곰 가족 목격" data-ja="🐻🐻 クマ親子目撃" data-en="🐻🐻 Bear Family Sighting">🐻🐻 곰 가족 목격</span>
+                        </option>
+                        <option value="곰 추정 목격">
+                            <span data-ko="⚫ 곰 추정 목격" data-ja="⚫ クマ可能性" data-en="⚫ Possible Bear Sighting">⚫ 곰 추정 목격</span>
+                        </option>
+                        <option value="곰에 의한 사상">
+                            <span data-ko="🤕 곰에 의한 사상" data-ja="🤕 クマによる人身事故" data-en="🤕 Bear Attack">🤕 곰에 의한 사상</span>
+                        </option>
                     </select>
                 </div>
+            </div>
+        </div>
+
+        <!-- 적용 중인 조건 -->
+        <div class="active-filters">
+            <div class="filter-label">
+                <span data-lang="ko">적용 중인 조건</span>
+                <span data-lang="ja" style="display:none;">適用中の条件</span>
+                <span data-lang="en" style="display:none;">Active Filters</span>
+            </div>
+            <div class="filter-tags" id="filterTags">
+                <span class="filter-tag all">
+                    <span data-lang="ko">전체</span>
+                    <span data-lang="ja" style="display:none;">全て</span>
+                    <span data-lang="en" style="display:none;">All</span>
+                </span>
             </div>
         </div>
 
