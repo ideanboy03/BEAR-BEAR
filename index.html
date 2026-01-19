@@ -82,6 +82,33 @@
             padding: 20px;
         }
 
+        .stats-bar {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2);
+            color: white;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            opacity: 0.95;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+        }
+
         .controls {
             background: #ffffff;
             border-radius: 12px;
@@ -106,97 +133,10 @@
             display: block;
         }
 
-        .radius-selector {
-            display: flex;
-            gap: 8px;
-        }
-
-        .radius-btn {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            background: #ffffff;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            color: #495057;
-            transition: all 0.2s;
-        }
-
-        .radius-btn:hover {
-            border-color: #ff6b35;
-            background: #fff5f2;
-        }
-
-        .radius-btn.active {
-            border-color: #ff6b35;
-            background: #ff6b35;
-            color: #ffffff;
-        }
-
-        .filter-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-        }
-
-        .filter-select {
-            padding: 10px 12px;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            font-size: 14px;
-            background: #ffffff;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .filter-select:focus {
-            outline: none;
-            border-color: #ff6b35;
-        }
-
-        .stats-bar {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #ff6b35 0%, #ff8c61 100%);
-            color: #ffffff;
-            padding: 16px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.2);
-        }
-
-        .stat-label {
-            font-size: 12px;
-            opacity: 0.9;
-            margin-bottom: 4px;
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-        }
-
         .slider-container {
-            margin-top: 12px;
-        }
-
-        .slider-wrapper {
             display: flex;
             align-items: center;
             gap: 12px;
-        }
-
-        .slider-label {
-            min-width: 80px;
-            font-size: 14px;
-            font-weight: 600;
-            color: #495057;
         }
 
         .slider {
@@ -206,93 +146,99 @@
             background: #e9ecef;
             outline: none;
             -webkit-appearance: none;
-            appearance: none;
         }
 
         .slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             background: #ff6b35;
             cursor: pointer;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            transition: all 0.2s;
-        }
-
-        .slider::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
-            background: #ff5722;
         }
 
         .slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             background: #ff6b35;
             cursor: pointer;
             border: none;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            transition: all 0.2s;
-        }
-
-        .slider::-moz-range-thumb:hover {
-            transform: scale(1.2);
-            background: #ff5722;
         }
 
         .slider-value {
-            min-width: 100px;
-            text-align: center;
+            min-width: 120px;
+            text-align: right;
             font-size: 14px;
             font-weight: 600;
             color: #212529;
-            background: #f8f9fa;
-            padding: 6px 12px;
-            border-radius: 6px;
+        }
+
+        .filter-group {
+            margin-bottom: 12px;
+        }
+
+        .filter-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #495057;
+            background: #ffffff;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #ff6b35;
         }
 
         .active-filters {
             background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 10px;
-            padding: 12px 16px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
         }
 
         .filter-label {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
-            color: #495057;
-            margin-right: 8px;
+            color: #6c757d;
+            margin-bottom: 8px;
         }
 
         .filter-tags {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
+            gap: 8px;
         }
 
         .filter-tag {
-            background: #ff6b35;
-            color: white;
-            padding: 4px 12px;
+            display: inline-block;
+            padding: 6px 12px;
+            background: #ffffff;
+            border: 1px solid #dee2e6;
             border-radius: 16px;
-            font-size: 12px;
-            font-weight: 500;
+            font-size: 13px;
+            color: #495057;
         }
 
         .filter-tag.all {
-            background: #6c757d;
+            background: #e7f5ff;
+            border-color: #339af0;
+            color: #1971c2;
         }
 
         .map-container {
-            position: relative;
             background: #ffffff;
             border-radius: 12px;
             overflow: hidden;
@@ -305,7 +251,7 @@
             height: 600px;
         }
 
-        .info-panel {
+        .recent-updates {
             background: #ffffff;
             border-radius: 12px;
             padding: 20px;
@@ -313,61 +259,68 @@
             border: 1px solid #e9ecef;
         }
 
-        .info-title {
+        .recent-title {
             font-size: 16px;
             font-weight: 700;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
             color: #212529;
         }
 
-        .info-list {
+        .recent-list {
             list-style: none;
         }
 
-        .info-item {
-            padding: 12px 0;
+        .recent-item {
+            padding: 12px;
             border-bottom: 1px solid #f1f3f5;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            gap: 12px;
+            align-items: flex-start;
         }
 
-        .info-item:last-child {
+        .recent-item:last-child {
             border-bottom: none;
         }
 
-        .info-item-label {
-            font-size: 14px;
-            color: #495057;
+        .recent-emoji {
+            font-size: 20px;
+            flex-shrink: 0;
         }
 
-        .info-item-value {
+        .recent-content {
+            flex: 1;
+        }
+
+        .recent-date {
+            font-size: 13px;
+            font-weight: 600;
+            color: #ff6b35;
+            margin-bottom: 4px;
+        }
+
+        .recent-location {
             font-size: 14px;
             font-weight: 600;
             color: #212529;
+            margin-bottom: 2px;
         }
 
-        .alert-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
+        .recent-type {
             font-size: 12px;
-            font-weight: 600;
+            color: #6c757d;
         }
 
-        .alert-high {
-            background: #ffe5e5;
-            color: #d32f2f;
+        .no-recent {
+            text-align: center;
+            padding: 32px;
+            color: #adb5bd;
+            font-size: 14px;
         }
 
-        .alert-medium {
-            background: #fff3e0;
-            color: #f57c00;
-        }
-
-        .alert-low {
-            background: #e8f5e9;
-            color: #388e3c;
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
         }
 
         .leaflet-popup-content-wrapper {
@@ -408,16 +361,8 @@
                 padding: 12px;
             }
 
-            .radius-selector {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
             #map {
                 height: 450px;
-            }
-
-            .stats-bar {
-                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -439,49 +384,127 @@
     </header>
 
     <div class="container">
-        <!-- 통계 카드 -->
+        <!-- 통계 카드 (표시 중인 출몰만) -->
         <div class="stats-bar">
             <div class="stat-card">
                 <div class="stat-label" data-lang="ko">표시 중인 출몰</div>
                 <div class="stat-label" data-lang="ja" style="display:none;">表示中の出没</div>
                 <div class="stat-label" data-lang="en" style="display:none;">Showing Sightings</div>
-                <div class="stat-value" id="visibleCount">363</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label" data-lang="ko">총 출몰 건수</div>
-                <div class="stat-label" data-lang="ja" style="display:none;">総出没件数</div>
-                <div class="stat-label" data-lang="en" style="display:none;">Total Sightings</div>
-                <div class="stat-value" id="totalCount">363</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label" data-lang="ko">선택된 지역</div>
-                <div class="stat-label" data-lang="ja" style="display:none;">選択地域</div>
-                <div class="stat-label" data-lang="en" style="display:none;">Selected Area</div>
-                <div class="stat-value" id="selectedArea" style="font-size: 18px;">전체</div>
+                <div class="stat-value" id="visibleCount">0</div>
             </div>
         </div>
 
-        <!-- 컨트롤 패널 -->
+        <!-- 적용 중인 조건 -->
+        <div class="active-filters">
+            <div class="filter-label">
+                <span data-lang="ko">적용 중인 조건</span>
+                <span data-lang="ja" style="display:none;">適用中の条件</span>
+                <span data-lang="en" style="display:none;">Active Filters</span>
+            </div>
+            <div class="filter-tags" id="filterTags">
+                <span class="filter-tag all">
+                    <span data-lang="ko">전체</span>
+                    <span data-lang="ja" style="display:none;">全て</span>
+                    <span data-lang="en" style="display:none;">All</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- 필터 컨트롤 -->
         <div class="controls">
+            <!-- 연도 슬라이더 -->
             <div class="control-group">
                 <label class="control-label">
-                    <span data-lang="ko">지역 선택</span>
-                    <span data-lang="ja" style="display:none;">地域選択</span>
-                    <span data-lang="en" style="display:none;">Select Area</span>
+                    <span data-lang="ko">연도</span>
+                    <span data-lang="ja" style="display:none;">年度</span>
+                    <span data-lang="en" style="display:none;">Year</span>
+                </label>
+                <div class="slider-container">
+                    <input type="range" min="0" max="8" value="0" class="slider" id="yearSlider" oninput="updateYearFilter()">
+                    <div class="slider-value" id="yearValue">
+                        <span data-lang="ko">전체 연도</span>
+                        <span data-lang="ja" style="display:none;">全ての年度</span>
+                        <span data-lang="en" style="display:none;">All Years</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 월 슬라이더 -->
+            <div class="control-group">
+                <label class="control-label">
+                    <span data-lang="ko">월</span>
+                    <span data-lang="ja" style="display:none;">月</span>
+                    <span data-lang="en" style="display:none;">Month</span>
+                </label>
+                <div class="slider-container">
+                    <input type="range" min="0" max="12" value="0" class="slider" id="monthSlider" oninput="updateMonthFilter()">
+                    <div class="slider-value">
+                        <span id="monthValue" data-lang="ko">전체 월</span>
+                        <span id="monthValue-ja" data-lang="ja" style="display:none;">全ての月</span>
+                        <span id="monthValue-en" data-lang="en" style="display:none;">All Months</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 요일 슬라이더 -->
+            <div class="control-group">
+                <label class="control-label">
+                    <span data-lang="ko">요일</span>
+                    <span data-lang="ja" style="display:none;">曜日</span>
+                    <span data-lang="en" style="display:none;">Day of Week</span>
+                </label>
+                <div class="slider-container">
+                    <input type="range" min="0" max="7" value="0" class="slider" id="weekdaySlider" oninput="updateWeekdayFilter()">
+                    <div class="slider-value">
+                        <span id="weekdayValue" data-lang="ko">전체 요일</span>
+                        <span id="weekdayValue-ja" data-lang="ja" style="display:none;">全ての曜日</span>
+                        <span id="weekdayValue-en" data-lang="en" style="display:none;">All Days</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 시간 슬라이더 -->
+            <div class="control-group">
+                <label class="control-label">
+                    <span data-lang="ko">시간</span>
+                    <span data-lang="ja" style="display:none;">時間</span>
+                    <span data-lang="en" style="display:none;">Time</span>
+                </label>
+                <div class="slider-container">
+                    <input type="range" min="0" max="25" value="0" class="slider" id="timeSlider" oninput="updateTimeFilter()">
+                    <div class="slider-value" id="timeValue">
+                        <span data-lang="ko">전체 시간</span>
+                        <span data-lang="ja" style="display:none;">全ての時間</span>
+                        <span data-lang="en" style="display:none;">All Hours</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 지역 필터 -->
+            <div class="control-group">
+                <label class="control-label">
+                    <span data-lang="ko">지역</span>
+                    <span data-lang="ja" style="display:none;">地域</span>
+                    <span data-lang="en" style="display:none;">Area</span>
                 </label>
                 <div class="filter-group">
                     <select class="filter-select" id="locationFilter" onchange="applyFilters()">
                         <option value="">전체 지역</option>
-                        <option value="南区">南区 (미나미구)</option>
-                        <option value="西区">西区 (니시구)</option>
-                        <option value="中央区">中央区 (주오구)</option>
-                        <option value="手稲区">手稲区 (테이네구)</option>
-                        <option value="豊平区">豊平区 (도요히라구)</option>
-                        <option value="清田区">清田区 (키요타구)</option>
+                        <option value="中央区">中央区</option>
+                        <option value="北区">北区</option>
+                        <option value="東区">東区</option>
+                        <option value="白石区">白石区</option>
+                        <option value="豊平区">豊平区</option>
+                        <option value="南区">南区</option>
+                        <option value="西区">西区</option>
+                        <option value="厚別区">厚別区</option>
+                        <option value="手稲区">手稲区</option>
+                        <option value="清田区">清田区</option>
                     </select>
                 </div>
             </div>
 
+            <!-- 목격 유형 필터 -->
             <div class="control-group">
                 <label class="control-label">
                     <span data-lang="ko">목격 유형</span>
@@ -500,102 +523,6 @@
                     </select>
                 </div>
             </div>
-
-            <div class="control-group">
-                <label class="control-label">
-                    <span data-lang="ko">월별 필터</span>
-                    <span data-lang="ja" style="display:none;">月別フィルター</span>
-                    <span data-lang="en" style="display:none;">Month Filter</span>
-                </label>
-                <div class="slider-container">
-                    <div class="slider-wrapper">
-                        <span class="slider-label">
-                            <span data-lang="ko">전체</span>
-                            <span data-lang="ja" style="display:none;">全て</span>
-                            <span data-lang="en" style="display:none;">All</span>
-                        </span>
-                        <input type="range" min="0" max="12" value="0" class="slider" id="monthSlider" oninput="updateMonthFilter()">
-                        <span class="slider-label">
-                            <span data-lang="ko">12월</span>
-                            <span data-lang="ja" style="display:none;">12月</span>
-                            <span data-lang="en" style="display:none;">Dec</span>
-                        </span>
-                        <div class="slider-value">
-                            <span id="monthValue" data-lang="ko">전체 월</span>
-                            <span id="monthValue-ja" data-lang="ja" style="display:none;">全ての月</span>
-                            <span id="monthValue-en" data-lang="en" style="display:none;">All Months</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="control-group">
-                <label class="control-label">
-                    <span data-lang="ko">요일 필터</span>
-                    <span data-lang="ja" style="display:none;">曜日フィルター</span>
-                    <span data-lang="en" style="display:none;">Weekday Filter</span>
-                </label>
-                <div class="slider-container">
-                    <div class="slider-wrapper">
-                        <span class="slider-label">
-                            <span data-lang="ko">전체</span>
-                            <span data-lang="ja" style="display:none;">全て</span>
-                            <span data-lang="en" style="display:none;">All</span>
-                        </span>
-                        <input type="range" min="0" max="7" value="0" class="slider" id="weekdaySlider" oninput="updateWeekdayFilter()">
-                        <span class="slider-label">
-                            <span data-lang="ko">일</span>
-                            <span data-lang="ja" style="display:none;">日</span>
-                            <span data-lang="en" style="display:none;">Sun</span>
-                        </span>
-                        <div class="slider-value">
-                            <span id="weekdayValue" data-lang="ko">전체 요일</span>
-                            <span id="weekdayValue-ja" data-lang="ja" style="display:none;">全ての曜日</span>
-                            <span id="weekdayValue-en" data-lang="en" style="display:none;">All Days</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="control-group">
-                <label class="control-label">
-                    <span data-lang="ko">시간대 필터</span>
-                    <span data-lang="ja" style="display:none;">時間帯フィルター</span>
-                    <span data-lang="en" style="display:none;">Time Filter</span>
-                </label>
-                <div class="slider-container">
-                    <div class="slider-wrapper">
-                        <span class="slider-label">
-                            <span data-lang="ko">전체</span>
-                            <span data-lang="ja" style="display:none;">全て</span>
-                            <span data-lang="en" style="display:none;">All</span>
-                        </span>
-                        <input type="range" min="0" max="24" value="0" class="slider" id="timeSlider" oninput="updateTimeFilter()">
-                        <span class="slider-label">24시</span>
-                        <div class="slider-value" id="timeValue">
-                            <span data-lang="ko">전체 시간</span>
-                            <span data-lang="ja" style="display:none;">全ての時間</span>
-                            <span data-lang="en" style="display:none;">All Hours</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 적용 중인 조건 표시 -->
-        <div class="active-filters" id="activeFilters">
-            <span class="filter-label">
-                <span data-lang="ko">🔍 적용 중인 조건:</span>
-                <span data-lang="ja" style="display:none;">🔍 適用中の条件:</span>
-                <span data-lang="en" style="display:none;">🔍 Active Filters:</span>
-            </span>
-            <span class="filter-tags" id="filterTags">
-                <span class="filter-tag">
-                    <span data-lang="ko">전체</span>
-                    <span data-lang="ja" style="display:none;">全て</span>
-                    <span data-lang="en" style="display:none;">All</span>
-                </span>
-            </span>
         </div>
 
         <!-- 지도 -->
@@ -603,53 +530,29 @@
             <div id="map"></div>
         </div>
 
-        <!-- 정보 패널 -->
-        <div class="info-panel">
-            <div class="info-title">
-                <span data-lang="ko">📊 출몰 통계</span>
-                <span data-lang="ja" style="display:none;">📊 出没統計</span>
-                <span data-lang="en" style="display:none;">📊 Statistics</span>
+        <!-- 최근 3일 업데이트 정보 -->
+        <div class="recent-updates">
+            <div class="recent-title">
+                <span data-lang="ko">최근 3일 업데이트</span>
+                <span data-lang="ja" style="display:none;">最近3日間の更新</span>
+                <span data-lang="en" style="display:none;">Recent 3 Days Updates</span>
             </div>
-            <ul class="info-list">
-                <li class="info-item">
-                    <span class="info-item-label" data-lang="ko">최다 출몰 지역</span>
-                    <span class="info-item-label" data-lang="ja" style="display:none;">最多出没地域</span>
-                    <span class="info-item-label" data-lang="en" style="display:none;">Most Active Area</span>
-                    <span class="info-item-value" id="maxLocation">南区 (218건)</span>
-                </li>
-                <li class="info-item">
-                    <span class="info-item-label" data-lang="ko">최다 출몰 월</span>
-                    <span class="info-item-label" data-lang="ja" style="display:none;">最多出没月</span>
-                    <span class="info-item-label" data-lang="en" style="display:none;">Peak Month</span>
-                    <span class="info-item-value" id="maxMonth">10월 (134건)</span>
-                </li>
-                <li class="info-item">
-                    <span class="info-item-label" data-lang="ko">최다 출몰 요일</span>
-                    <span class="info-item-label" data-lang="ja" style="display:none;">最多出没曜日</span>
-                    <span class="info-item-label" data-lang="en" style="display:none;">Peak Weekday</span>
-                    <span class="info-item-value" id="maxWeekday">목요일 (55건)</span>
-                </li>
-                <li class="info-item">
-                    <span class="info-item-label" data-lang="ko">최다 출몰 시간대</span>
-                    <span class="info-item-label" data-lang="ja" style="display:none;">最多出没時間帯</span>
-                    <span class="info-item-label" data-lang="en" style="display:none;">Peak Time</span>
-                    <span class="info-item-value" id="maxTime">20시~21시 (25건)</span>
-                </li>
-                <li class="info-item">
-                    <span class="info-item-label" data-lang="ko">데이터 기간</span>
-                    <span class="info-item-label" data-lang="ja" style="display:none;">データ期間</span>
-                    <span class="info-item-label" data-lang="en" style="display:none;">Data Period</span>
-                    <span class="info-item-value">2025년</span>
+            <ul class="recent-list" id="recentList">
+                <li class="no-recent">
+                    <span data-lang="ko">데이터 로딩 중...</span>
+                    <span data-lang="ja" style="display:none;">データ読み込み中...</span>
+                    <span data-lang="en" style="display:none;">Loading data...</span>
                 </li>
             </ul>
         </div>
-    </div>
 
-    <div class="footer">
-        <p style="font-size: 11px; line-height: 1.6; color: #6c757d; text-align: center;">
-            本ページは、札幌市が公開している ヒグマ出没情報（公開データ）を基に、個人が独自に整理・可視化したものです。<br>
-            内容は札幌市の公式見解を示すものではありません。
-        </p>
+        <!-- Footer -->
+        <div class="footer">
+            <p style="font-size: 11px; line-height: 1.6; color: #6c757d; text-align: center;">
+                本ページは、札幌市が公開している ヒグマ出没情報（公開データ）を基に、個人が独自に整理・可視化したものです。<br>
+                内容は札幌市の公式見解を示すものではありません。
+            </p>
+        </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

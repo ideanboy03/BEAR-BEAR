@@ -4,6 +4,7 @@ let markers = [];
 let allBearData = [];
 let filteredData = [];
 let currentLanguage = 'ko';
+let currentYear = null;
 let currentMonth = null;
 let currentHour = null;
 let currentWeekday = null;
@@ -15,7 +16,7 @@ const SHEET_ID = '1YlsTXib1LEbk_DkQlhIGwstQ4DenSRWeyTBpJsRR-IQ';
 const SHEET_NAME = '불곰출몰정보';
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
 
-// 목격 유형별 이모지 매핑
+// 목격 유형별 이모지 및 번역 매핑
 const SIGHTING_TYPE_EMOJI = {
     '곰 목격': '🐻',
     '곰 흔적 확인': '👣',
@@ -24,6 +25,15 @@ const SIGHTING_TYPE_EMOJI = {
     '곰 추정 목격': '⚫',
     '곰에 의한 사상': '🤕',
     'default': '🐻'
+};
+
+const SIGHTING_TYPE_TRANSLATIONS = {
+    '곰 목격': { ko: '곰 목격', ja: 'クマ目撃', en: 'Bear Sighting' },
+    '곰 흔적 확인': { ko: '곰 흔적 확인', ja: 'クマ痕跡確認', en: 'Bear Tracks Found' },
+    '곰 사살': { ko: '곰 사살', ja: 'クマ駆除', en: 'Bear Captured' },
+    '곰 가족 목격': { ko: '곰 가족 목격', ja: 'クマ親子目撃', en: 'Bear Family Sighting' },
+    '곰 추정 목격': { ko: '곰 추정 목격', ja: 'クマ可能性', en: 'Possible Bear Sighting' },
+    '곰에 의한 사상': { ko: '곰에 의한 사상', ja: 'クマによる人身事故', en: 'Bear Attack' }
 };
 
 // 목격 유형 정규화
@@ -67,14 +77,10 @@ async function loadBearDataFromGoogleSheets() {
             '金': '금', '土': '토', '日': '일'
         };
         
-        // 구조: API의 rows[0]이 헤더, rows[1]부터 데이터
-        // 하지만 실제로는 rows[0]도 데이터일 수 있으니 검증 필요
-        
         // 첫 행이 헤더인지 데이터인지 확인
         let startIndex = 0;
         if (rows[0] && rows[0].c) {
             const firstCell = rows[0].c[0]?.v;
-            // 첫 셀이 "연번" 같은 텍스트면 헤더
             if (firstCell && (typeof firstCell === 'string' || firstCell === '연번')) {
                 startIndex = 1;
             }
@@ -93,19 +99,18 @@ async function loadBearDataFromGoogleSheets() {
                 return cells[idx]?.v ?? null;
             };
             
-            // A열 삭제 후 컬럼 인덱스: 0부터 시작
-            const id = getCellByIndex(0);              // A열: 연번
-            const year = getCellByIndex(1) || 2025;    // B열: 연도
-            const month = getCellByIndex(2);           // C열: 월
-            const day = getCellByIndex(3);             // D열: 일
-            const weekdayJa = getCellByIndex(4);       // E열: 요일
-            const time = getCellByIndex(5);            // F열: 시간
-            const location = getCellByIndex(8);        // I열: 하위 행정
-            const address = getCellByIndex(9);         // J열: 세부 주소
-            const description = getCellByIndex(10);    // K열: 내용
-            const sightingTypeRaw = getCellByIndex(11); // L열: 목격 정보
-            const lat = getCellByIndex(13);            // N열: Latitude
-            const lng = getCellByIndex(14);            // O열: Longitude
+            const id = getCellByIndex(0);
+            const year = getCellByIndex(1) || 2025;
+            const month = getCellByIndex(2);
+            const day = getCellByIndex(3);
+            const weekdayJa = getCellByIndex(4);
+            const time = getCellByIndex(5);
+            const location = getCellByIndex(8);
+            const address = getCellByIndex(9);
+            const description = getCellByIndex(10);
+            const sightingTypeRaw = getCellByIndex(11);
+            const lat = getCellByIndex(13);
+            const lng = getCellByIndex(14);
             
             if (lat !== null && lng !== null && !isNaN(lat) && !isNaN(lng)) {
                 const weekday = weekdayMap[weekdayJa] || weekdayJa;
@@ -113,8 +118,10 @@ async function loadBearDataFromGoogleSheets() {
                 
                 bearData.push({
                     id: id,
+                    year: year,
                     date: `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
                     month: month,
+                    day: day,
                     weekday: weekday,
                     time: time,
                     location: location,
@@ -122,7 +129,8 @@ async function loadBearDataFromGoogleSheets() {
                     description: description,
                     sightingType: sightingType,
                     lat: parseFloat(lat),
-                    lng: parseFloat(lng)
+                    lng: parseFloat(lng),
+                    timestamp: new Date(year, month - 1, day).getTime()
                 });
             }
         }
@@ -133,7 +141,7 @@ async function loadBearDataFromGoogleSheets() {
         console.log(`✓ ${allBearData.length}건의 곰 출몰 데이터 로드 완료`);
         
         updateMarkers();
-        updateDynamicStats();
+        updateRecentUpdates();
         updateActiveFilters();
         
     } catch (error) {
@@ -196,12 +204,66 @@ function createBearMarker(bear) {
     return marker;
 }
 
+// 최근 3일 업데이트 정보 표시
+function updateRecentUpdates() {
+    const now = Date.now();
+    const threeDaysAgo = now - (3 * 24 * 60 * 60 * 1000);
+    
+    const recentData = allBearData
+        .filter(bear => bear.timestamp >= threeDaysAgo)
+        .sort((a, b) => b.timestamp - a.timestamp);
+    
+    const recentList = document.getElementById('recentList');
+    
+    if (recentData.length === 0) {
+        recentList.innerHTML = `
+            <li class="no-recent">
+                <span data-lang="ko">최근 3일간 업데이트가 없습니다</span>
+                <span data-lang="ja" style="display:none;">最近3日間の更新はありません</span>
+                <span data-lang="en" style="display:none;">No updates in the last 3 days</span>
+            </li>
+        `;
+    } else {
+        recentList.innerHTML = recentData.map(bear => {
+            const emoji = SIGHTING_TYPE_EMOJI[bear.sightingType] || SIGHTING_TYPE_EMOJI['default'];
+            const sightingTypeText = SIGHTING_TYPE_TRANSLATIONS[bear.sightingType];
+            
+            return `
+                <li class="recent-item">
+                    <div class="recent-emoji">${emoji}</div>
+                    <div class="recent-content">
+                        <div class="recent-date">${bear.date} ${bear.time || ''}</div>
+                        <div class="recent-location">${bear.location}</div>
+                        <div class="recent-type">
+                            <span data-lang="ko">${sightingTypeText.ko}</span>
+                            <span data-lang="ja" style="display:none;">${sightingTypeText.ja}</span>
+                            <span data-lang="en" style="display:none;">${sightingTypeText.en}</span>
+                        </div>
+                    </div>
+                </li>
+            `;
+        }).join('');
+    }
+    
+    // 언어 설정 다시 적용
+    document.querySelectorAll('[data-lang]').forEach(elem => {
+        elem.style.display = 'none';
+    });
+    document.querySelectorAll(`[data-lang="${currentLanguage}"]`).forEach(elem => {
+        elem.style.display = '';
+    });
+}
+
 // 적용 중인 조건 표시 업데이트
 function updateActiveFilters() {
     const filterTags = [];
     
     if (currentLocation) {
         filterTags.push(currentLocation);
+    }
+    
+    if (currentYear !== null) {
+        filterTags.push(`${currentYear}년`);
     }
     
     if (currentMonth !== null) {
@@ -212,7 +274,9 @@ function updateActiveFilters() {
         filterTags.push(`${currentWeekday}요일`);
     }
     
-    if (currentHour !== null) {
+    if (currentHour === -1) {
+        filterTags.push('시간 불명');
+    } else if (currentHour !== null) {
         filterTags.push(`${currentHour}시~${currentHour+1}시`);
     }
     
@@ -241,6 +305,39 @@ function updateActiveFilters() {
         elem.style.display = 'none';
     });
     document.querySelectorAll(`[data-lang="${currentLanguage}"]`).forEach(elem => {
+        elem.style.display = '';
+    });
+}
+
+// 연도 슬라이더 업데이트
+function updateYearFilter() {
+    const slider = document.getElementById('yearSlider');
+    const value = parseInt(slider.value);
+    
+    if (value === 0) {
+        currentYear = null;
+        updateYearLabel('전체 연도', '全ての年度', 'All Years');
+    } else {
+        const year = 2018 + value; // 0=전체, 1=2019, 2=2020, ..., 8=2026
+        currentYear = year;
+        updateYearLabel(`${year}년`, `${year}年`, `${year}`);
+    }
+    
+    applyFilters();
+}
+
+// 연도 레이블 업데이트
+function updateYearLabel(ko, ja, en) {
+    document.getElementById('yearValue').innerHTML = `
+        <span data-lang="ko">${ko}</span>
+        <span data-lang="ja" style="display:none;">${ja}</span>
+        <span data-lang="en" style="display:none;">${en}</span>
+    `;
+    
+    document.querySelectorAll('#yearValue [data-lang]').forEach(elem => {
+        elem.style.display = 'none';
+    });
+    document.querySelectorAll(`#yearValue [data-lang="${currentLanguage}"]`).forEach(elem => {
         elem.style.display = '';
     });
 }
@@ -286,8 +383,11 @@ function updateTimeFilter() {
     if (value === 0) {
         currentHour = null;
         updateTimeLabel('전체 시간', '全ての時間', 'All Hours');
+    } else if (value === 1) {
+        currentHour = -1; // 시간 불명
+        updateTimeLabel('시간 불명', '時間不明', 'Time Unknown');
     } else {
-        const hour = value - 1;
+        const hour = value - 2; // value 2 = 0시, 3 = 1시, ..., 25 = 23시
         currentHour = hour;
         updateTimeLabel(`${hour}시~${hour+1}시`, `${hour}時~${hour+1}時`, `${hour}:00-${hour+1}:00`);
     }
@@ -297,21 +397,11 @@ function updateTimeFilter() {
 
 // 시간 레이블 업데이트
 function updateTimeLabel(ko, ja, en) {
-    const timeValueKo = document.querySelector('#timeValue [data-lang="ko"]');
-    
-    if (timeValueKo) {
-        timeValueKo.textContent = ko;
-        const timeValueJa = document.querySelector('#timeValue [data-lang="ja"]');
-        const timeValueEn = document.querySelector('#timeValue [data-lang="en"]');
-        if (timeValueJa) timeValueJa.textContent = ja;
-        if (timeValueEn) timeValueEn.textContent = en;
-    } else {
-        document.getElementById('timeValue').innerHTML = `
-            <span data-lang="ko">${ko}</span>
-            <span data-lang="ja" style="display:none;">${ja}</span>
-            <span data-lang="en" style="display:none;">${en}</span>
-        `;
-    }
+    document.getElementById('timeValue').innerHTML = `
+        <span data-lang="ko">${ko}</span>
+        <span data-lang="ja" style="display:none;">${ja}</span>
+        <span data-lang="en" style="display:none;">${en}</span>
+    `;
     
     document.querySelectorAll('#timeValue [data-lang]').forEach(elem => {
         elem.style.display = 'none';
@@ -372,14 +462,27 @@ function applyFilters() {
     filteredData = allBearData.filter(bear => {
         let matches = true;
 
+        if (currentYear !== null && bear.year !== currentYear) {
+            matches = false;
+        }
+
         if (currentMonth !== null && bear.month !== currentMonth) {
             matches = false;
         }
 
-        if (currentHour !== null && bear.time) {
-            const bearHour = extractHour(bear.time);
-            if (bearHour !== currentHour) {
+        if (currentHour === -1) {
+            // 시간 불명: time이 null이거나 빈 문자열
+            if (bear.time && bear.time.toString().trim() !== '') {
                 matches = false;
+            }
+        } else if (currentHour !== null) {
+            if (!bear.time) {
+                matches = false;
+            } else {
+                const bearHour = extractHour(bear.time);
+                if (bearHour !== currentHour) {
+                    matches = false;
+                }
             }
         }
 
@@ -399,7 +502,6 @@ function applyFilters() {
     });
 
     updateMarkers();
-    updateDynamicStats();
     updateActiveFilters();
 }
 
@@ -413,85 +515,6 @@ function extractHour(timeString) {
 // 통계 업데이트
 function updateStats() {
     document.getElementById('visibleCount').textContent = filteredData.length;
-    document.getElementById('totalCount').textContent = allBearData.length;
-    
-    const selectedAreaElem = document.getElementById('selectedArea');
-    if (currentLocation) {
-        selectedAreaElem.textContent = currentLocation;
-    } else {
-        if (currentLanguage === 'ko') {
-            selectedAreaElem.textContent = '전체';
-        } else if (currentLanguage === 'ja') {
-            selectedAreaElem.textContent = '全て';
-        } else {
-            selectedAreaElem.textContent = 'All';
-        }
-    }
-}
-
-// 동적 통계 업데이트
-function updateDynamicStats() {
-    const stats = calculateStats(filteredData.length > 0 ? filteredData : allBearData);
-    
-    document.getElementById('maxLocation').textContent = `${stats.maxLocation.name} (${stats.maxLocation.count}건)`;
-    document.getElementById('maxMonth').textContent = `${stats.maxMonth.name}월 (${stats.maxMonth.count}건)`;
-    document.getElementById('maxWeekday').textContent = `${stats.maxWeekday.name}요일 (${stats.maxWeekday.count}건)`;
-    document.getElementById('maxTime').textContent = `${stats.maxTime.name}시~${stats.maxTime.name + 1}시 (${stats.maxTime.count}건)`;
-    
-    updateStats();
-}
-
-// 통계 계산
-function calculateStats(data) {
-    const locationCounts = {};
-    data.forEach(bear => {
-        if (bear.location) {
-            locationCounts[bear.location] = (locationCounts[bear.location] || 0) + 1;
-        }
-    });
-    const maxLocation = Object.keys(locationCounts).length > 0 
-        ? Object.entries(locationCounts).reduce((a, b) => a[1] > b[1] ? a : b)
-        : ['N/A', 0];
-    
-    const monthCounts = {};
-    data.forEach(bear => {
-        if (bear.month) {
-            monthCounts[bear.month] = (monthCounts[bear.month] || 0) + 1;
-        }
-    });
-    const maxMonth = Object.keys(monthCounts).length > 0
-        ? Object.entries(monthCounts).reduce((a, b) => a[1] > b[1] ? a : b)
-        : [0, 0];
-    
-    const weekdayCounts = {};
-    data.forEach(bear => {
-        if (bear.weekday) {
-            weekdayCounts[bear.weekday] = (weekdayCounts[bear.weekday] || 0) + 1;
-        }
-    });
-    const maxWeekday = Object.keys(weekdayCounts).length > 0
-        ? Object.entries(weekdayCounts).reduce((a, b) => a[1] > b[1] ? a : b)
-        : ['N/A', 0];
-    
-    const hourCounts = {};
-    data.forEach(bear => {
-        if (bear.time) {
-            const hour = extractHour(bear.time);
-            if (hour !== null) {
-                hourCounts[hour] = (hourCounts[hour] || 0) + 1;
-            }
-        }
-    });
-    const maxTime = Object.keys(hourCounts).length > 0
-        ? Object.entries(hourCounts).reduce((a, b) => a[1] > b[1] ? a : b).map(v => parseInt(v))
-        : [0, 0];
-    
-    return {
-        maxLocation: { name: maxLocation[0], count: maxLocation[1] },
-        maxMonth: { name: maxMonth[0], count: maxMonth[1] },
-        maxWeekday: { name: maxWeekday[0], count: maxWeekday[1] },
-        maxTime: { name: maxTime[0], count: maxTime[1] }
-    };
 }
 
 // 언어 변경
@@ -523,6 +546,7 @@ function updateFilterLabels(lang) {
     const labels = {
         ko: {
             allLocations: '전체 지역',
+            allYears: '전체 연도',
             allMonths: '전체 월',
             allTime: '전체 시간',
             allWeekdays: '전체 요일',
@@ -530,6 +554,7 @@ function updateFilterLabels(lang) {
         },
         ja: {
             allLocations: '全ての地域',
+            allYears: '全ての年度',
             allMonths: '全ての月',
             allTime: '全ての時間',
             allWeekdays: '全ての曜日',
@@ -537,6 +562,7 @@ function updateFilterLabels(lang) {
         },
         en: {
             allLocations: 'All Areas',
+            allYears: 'All Years',
             allMonths: 'All Months',
             allTime: 'All Hours',
             allWeekdays: 'All Days',
@@ -546,6 +572,10 @@ function updateFilterLabels(lang) {
 
     locationFilter.options[0].text = labels[lang].allLocations;
     sightingTypeFilter.options[0].text = labels[lang].allTypes;
+    
+    if (currentYear === null) {
+        updateYearLabel(labels[lang].allYears, labels['ja'].allYears, labels['en'].allYears);
+    }
     
     if (currentMonth === null) {
         updateMonthLabel(labels[lang].allMonths, labels['ja'].allMonths, labels['en'].allMonths);
