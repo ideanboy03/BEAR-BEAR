@@ -471,16 +471,21 @@ function applyFilters() {
         }
 
         if (currentHour === -1) {
-            // 시간 불명: time 필드에 '時間不明'이 포함된 경우
-            const timeStr = bear.time ? bear.time.toString().trim() : '';
-            if (!timeStr.includes('時間不明') && !timeStr.includes('시간 불명') && !timeStr.includes('不明')) {
+            // 시간 불명: time 필드에 '時間不明'이 포함된 경우만
+            // Date 객체는 시간이 있는 것으로 간주
+            const timeStr = bear.time ? bear.time.toString() : '';
+            const isDateObject = timeStr.startsWith('Date(');
+            const hasTimeUnknown = timeStr.includes('時間不明') || timeStr.includes('시간 불명');
+            
+            if (isDateObject || !hasTimeUnknown) {
                 matches = false;
             }
         } else if (currentHour !== null) {
             // 특정 시간대 필터
-            const timeStr = bear.time ? bear.time.toString().trim() : '';
+            const timeStr = bear.time ? bear.time.toString() : '';
+            
             // 時間不明이 포함되어 있으면 제외
-            if (timeStr.includes('時間不明') || timeStr.includes('시간 불명') || timeStr.includes('不明')) {
+            if (timeStr.includes('時間不明') || timeStr.includes('시간 불명')) {
                 matches = false;
             } else {
                 const bearHour = extractHour(bear.time);
@@ -510,9 +515,22 @@ function applyFilters() {
 }
 
 // 시간 문자열에서 시간 추출
-function extractHour(timeString) {
-    if (!timeString) return null;
-    const match = timeString.toString().match(/^(\d+):/);
+function extractHour(timeValue) {
+    if (!timeValue) return null;
+    
+    const timeStr = timeValue.toString();
+    
+    // Date 객체인 경우 (예: "Date(1899,11,30,9,5,0)")
+    if (timeStr.startsWith('Date(')) {
+        const match = timeStr.match(/Date\(\d+,\d+,\d+,(\d+),/);
+        if (match) {
+            return parseInt(match[1]);
+        }
+        return null;
+    }
+    
+    // 일반 시간 문자열인 경우 (예: "10:30")
+    const match = timeStr.match(/^(\d+):/);
     return match ? parseInt(match[1]) : null;
 }
 
