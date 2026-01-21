@@ -10,6 +10,8 @@ let currentHour = null;
 let currentWeekday = null;
 let currentLocation = null;
 let currentSightingType = null;
+let minDataYear = 2019; // 기본값
+let maxDataYear = 2026; // 기본값
 
 // 구글 시트 설정
 const SHEET_ID = '1YlsTXib1LEbk_DkQlhIGwstQ4DenSRWeyTBpJsRR-IQ';
@@ -50,6 +52,21 @@ function normalizeSightingType(type) {
     return '곰 목격';
 }
 
+// 동적 연도 슬라이더 설정
+function setupYearSlider(minYear, maxYear) {
+    minDataYear = minYear;
+    maxDataYear = maxYear;
+    
+    const yearSlider = document.getElementById('yearSlider');
+    const yearRange = maxYear - minYear;
+    
+    // 슬라이더 최대값 설정: 0 (전체) + 연도 개수
+    yearSlider.max = yearRange + 1;
+    yearSlider.value = 0; // 초기값은 전체
+    
+    console.log(`연도 슬라이더 설정: ${minYear}년 ~ ${maxYear}년 (범위: ${yearRange + 1})`);
+}
+
 // 지도 초기화
 function initMap() {
     map = L.map('map').setView([43.0642, 141.3469], 11);
@@ -88,6 +105,9 @@ async function loadBearDataFromGoogleSheets() {
         
         console.log('데이터 시작 인덱스:', startIndex);
         
+        let minYear = Infinity;
+        let maxYear = -Infinity;
+        
         for (let i = startIndex; i < rows.length; i++) {
             const row = rows[i];
             
@@ -116,6 +136,10 @@ async function loadBearDataFromGoogleSheets() {
                 const weekday = weekdayMap[weekdayJa] || weekdayJa;
                 const sightingType = normalizeSightingType(sightingTypeRaw);
                 
+                // 최소/최대 연도 업데이트
+                if (year < minYear) minYear = year;
+                if (year > maxYear) maxYear = year;
+                
                 bearData.push({
                     id: id,
                     year: year,
@@ -139,10 +163,16 @@ async function loadBearDataFromGoogleSheets() {
         filteredData = [...allBearData];
         
         console.log(`✓ ${allBearData.length}건의 곰 출몰 데이터 로드 완료`);
+        console.log(`연도 범위: ${minYear}년 ~ ${maxYear}년`);
+        
+        // 동적 연도 슬라이더 설정
+        setupYearSlider(minYear, maxYear);
         
         updateMarkers();
         updateRecentUpdates();
-        updateActiveFilters();
+        
+        // 자동 필터 설정
+        setInitialFilters();
         
     } catch (error) {
         console.error('구글 시트 데이터 로드 실패:', error);
@@ -318,7 +348,7 @@ function updateYearFilter() {
         currentYear = null;
         updateYearLabel('전체 연도', '全ての年度', 'All Years');
     } else {
-        const year = 2018 + value; // 0=전체, 1=2019, 2=2020, ..., 8=2026
+        const year = minDataYear + value - 1; // value 1 = minYear, 2 = minYear+1, ...
         currentYear = year;
         updateYearLabel(`${year}년`, `${year}年`, `${year}`);
     }
@@ -639,4 +669,27 @@ function updateFilterLabels(lang) {
 // 페이지 로드 시 실행
 document.addEventListener('DOMContentLoaded', () => {
     initMap();
+    
+    // 데이터 로드 완료 후 자동 필터 설정을 위한 이벤트 리스너
+    // (loadBearDataFromGoogleSheets에서 setupYearSlider 호출 후 실행됨)
 });
+
+// 데이터 로드 후 자동 필터 설정
+function setInitialFilters() {
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth() + 1; // 0-11 → 1-12
+    
+    // 연도 슬라이더 설정 (동적 범위 기반)
+    if (currentYear >= minDataYear && currentYear <= maxDataYear) {
+        const yearSliderValue = currentYear - minDataYear + 1; // minYear=1, minYear+1=2, ...
+        document.getElementById('yearSlider').value = yearSliderValue;
+        updateYearFilter();
+    }
+    
+    // 월 슬라이더 설정 (1-12)
+    if (currentMonth >= 1 && currentMonth <= 12) {
+        document.getElementById('monthSlider').value = currentMonth;
+        updateMonthFilter();
+    }
+}
