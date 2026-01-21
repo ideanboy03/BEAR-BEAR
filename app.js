@@ -54,17 +54,26 @@ function normalizeSightingType(type) {
 
 // 동적 연도 슬라이더 설정
 function setupYearSlider(minYear, maxYear) {
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    
+    // 최대 연도는 데이터 최대 연도와 현재 연도 중 큰 값
+    const effectiveMaxYear = Math.max(maxYear, currentYear);
+    
     minDataYear = minYear;
-    maxDataYear = maxYear;
+    maxDataYear = effectiveMaxYear;
     
     const yearSlider = document.getElementById('yearSlider');
-    const yearRange = maxYear - minYear;
+    const yearRange = effectiveMaxYear - minYear;
     
     // 슬라이더 최대값 설정: 0 (전체) + 연도 개수
     yearSlider.max = yearRange + 1;
     yearSlider.value = 0; // 초기값은 전체
     
-    console.log(`연도 슬라이더 설정: ${minYear}년 ~ ${maxYear}년 (범위: ${yearRange + 1})`);
+    console.log(`연도 슬라이더 설정: ${minYear}년 ~ ${effectiveMaxYear}년 (범위: ${yearRange + 1})`);
+    console.log(`  - 데이터 최대 연도: ${maxYear}년`);
+    console.log(`  - 현재 연도: ${currentYear}년`);
+    console.log(`  - 적용된 최대 연도: ${effectiveMaxYear}년`);
     
     // 슬라이더 설정 후 자동 필터 적용
     setInitialFilters();
@@ -680,39 +689,27 @@ function setInitialFilters() {
     const currentYear = today.getFullYear();
     const currentMonth = today.getMonth() + 1; // 0-11 → 1-12
     
-    console.log(`자동 필터 설정: ${currentYear}년 ${currentMonth}월`);
-    console.log(`데이터 연도 범위: ${minDataYear}년 ~ ${maxDataYear}년`);
+    console.log(`\n자동 필터 설정: ${currentYear}년 ${currentMonth}월`);
+    console.log(`설정된 연도 범위: ${minDataYear}년 ~ ${maxDataYear}년`);
     
-    // 연도 슬라이더 설정 (동적 범위 기반)
-    let targetYear = currentYear;
-    
+    // 연도 슬라이더 설정
+    // maxDataYear는 이미 currentYear를 고려해서 설정되었으므로 항상 범위 내
     if (currentYear >= minDataYear && currentYear <= maxDataYear) {
-        // 현재 연도가 데이터 범위 내
         const yearSliderValue = currentYear - minDataYear + 1;
-        console.log(`연도 슬라이더 값 설정: ${yearSliderValue} (${currentYear}년)`);
+        console.log(`✓ 연도 필터: ${currentYear}년 (슬라이더 값: ${yearSliderValue})`);
         document.getElementById('yearSlider').value = yearSliderValue;
         updateYearFilter();
-    } else if (currentYear > maxDataYear) {
-        // 현재 연도가 데이터 최대 연도보다 미래 → 최대 연도 선택
-        targetYear = maxDataYear;
-        const yearSliderValue = maxDataYear - minDataYear + 1;
-        console.log(`현재 연도(${currentYear})가 데이터 범위 초과 - 최대 연도(${maxDataYear}년) 선택`);
-        console.log(`연도 슬라이더 값 설정: ${yearSliderValue} (${maxDataYear}년)`);
-        document.getElementById('yearSlider').value = yearSliderValue;
-        updateYearFilter();
-    } else {
-        // 현재 연도가 데이터 최소 연도보다 과거 → 최소 연도 선택
-        targetYear = minDataYear;
+    } else if (currentYear < minDataYear) {
+        // 현재 연도가 데이터 최소 연도보다 과거 (거의 없는 경우)
         const yearSliderValue = 1;
-        console.log(`현재 연도(${currentYear})가 데이터 범위 미만 - 최소 연도(${minDataYear}년) 선택`);
-        console.log(`연도 슬라이더 값 설정: ${yearSliderValue} (${minDataYear}년)`);
+        console.log(`✓ 연도 필터: ${minDataYear}년 (최소 연도, 슬라이더 값: ${yearSliderValue})`);
         document.getElementById('yearSlider').value = yearSliderValue;
         updateYearFilter();
     }
     
     // 월 슬라이더 설정 (1-12)
     if (currentMonth >= 1 && currentMonth <= 12) {
-        console.log(`월 슬라이더 값 설정: ${currentMonth}`);
+        console.log(`✓ 월 필터: ${currentMonth}월`);
         document.getElementById('monthSlider').value = currentMonth;
         updateMonthFilter();
     }
