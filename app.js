@@ -65,6 +65,9 @@ function setupYearSlider(minYear, maxYear) {
     yearSlider.value = 0; // 초기값은 전체
     
     console.log(`연도 슬라이더 설정: ${minYear}년 ~ ${maxYear}년 (범위: ${yearRange + 1})`);
+    
+    // 슬라이더 설정 후 자동 필터 적용
+    setInitialFilters();
 }
 
 // 지도 초기화
@@ -165,14 +168,11 @@ async function loadBearDataFromGoogleSheets() {
         console.log(`✓ ${allBearData.length}건의 곰 출몰 데이터 로드 완료`);
         console.log(`연도 범위: ${minYear}년 ~ ${maxYear}년`);
         
-        // 동적 연도 슬라이더 설정
+        // 동적 연도 슬라이더 설정 (내부에서 setInitialFilters 호출)
         setupYearSlider(minYear, maxYear);
         
         updateMarkers();
         updateRecentUpdates();
-        
-        // 자동 필터 설정
-        setInitialFilters();
         
     } catch (error) {
         console.error('구글 시트 데이터 로드 실패:', error);
@@ -680,15 +680,22 @@ function setInitialFilters() {
     const currentYear = today.getFullYear();
     const currentMonth = today.getMonth() + 1; // 0-11 → 1-12
     
+    console.log(`자동 필터 설정: ${currentYear}년 ${currentMonth}월`);
+    console.log(`데이터 연도 범위: ${minDataYear}년 ~ ${maxDataYear}년`);
+    
     // 연도 슬라이더 설정 (동적 범위 기반)
     if (currentYear >= minDataYear && currentYear <= maxDataYear) {
         const yearSliderValue = currentYear - minDataYear + 1; // minYear=1, minYear+1=2, ...
+        console.log(`연도 슬라이더 값 설정: ${yearSliderValue} (${currentYear}년)`);
         document.getElementById('yearSlider').value = yearSliderValue;
         updateYearFilter();
+    } else {
+        console.log(`현재 연도(${currentYear})가 데이터 범위를 벗어남 - 전체로 유지`);
     }
     
     // 월 슬라이더 설정 (1-12)
     if (currentMonth >= 1 && currentMonth <= 12) {
+        console.log(`월 슬라이더 값 설정: ${currentMonth}`);
         document.getElementById('monthSlider').value = currentMonth;
         updateMonthFilter();
     }
