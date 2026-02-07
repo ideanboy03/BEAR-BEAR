@@ -76,6 +76,85 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
+        /* Custom sighting type dropdown */
+        .custom-select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        .custom-select-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: #fff;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #495057;
+            transition: border-color 0.2s;
+        }
+        .custom-select-trigger:hover {
+            border-color: #80bdff;
+        }
+        .custom-select-arrow {
+            font-size: 12px;
+            color: #6c757d;
+        }
+        .custom-select-options {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            margin-top: 4px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            max-height: 280px;
+            overflow-y: auto;
+        }
+        .custom-select-options.open {
+            display: block;
+        }
+        .custom-select-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #495057;
+            transition: background 0.15s;
+        }
+        .custom-select-option:hover {
+            background: #f0f7ff;
+        }
+        .custom-select-option.selected {
+            background: #e7f1ff;
+            font-weight: 600;
+        }
+        .custom-select-option:first-child {
+            border-radius: 8px 8px 0 0;
+        }
+        .custom-select-option:last-child {
+            border-radius: 0 0 8px 8px;
+        }
+        .option-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .trigger-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -380,9 +459,9 @@
                 <span data-lang="en" style="display:none;">Sapporo Bear Alert</span>
             </div>
             <div class="language-toggle">
-                <button class="lang-btn active" data-lang="ko" onclick="setLanguage('ko')">한국어</button>
-                <button class="lang-btn" data-lang="ja" onclick="setLanguage('ja')">日本語</button>
-                <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">English</button>
+                <button class="lang-btn active" id="langBtn-ko" onclick="setLanguage('ko')">한국어</button>
+                <button class="lang-btn" id="langBtn-ja" onclick="setLanguage('ja')">日本語</button>
+                <button class="lang-btn" id="langBtn-en" onclick="setLanguage('en')">English</button>
             </div>
         </div>
     </header>
@@ -510,15 +589,42 @@
                     <span data-lang="en" style="display:none;">Sighting Type</span>
                 </label>
                 <div class="filter-group">
-                    <select class="filter-select" id="sightingTypeFilter" onchange="applyFilters()">
-                        <option value="">전체 유형</option>
-                        <option value="곰 목격">🐻 곰 목격</option>
-                        <option value="곰 흔적 확인">👣 곰 흔적 확인</option>
-                        <option value="곰 사살">🔴 곰 사살</option>
-                        <option value="곰 가족 목격">🐻🐻 곰 가족 목격</option>
-                        <option value="곰 추정 목격">⚫ 곰 추정 목격</option>
-                        <option value="곰에 의한 사상">🤕 곰에 의한 사상</option>
-                    </select>
+                    <div class="custom-select-wrapper" id="sightingTypeWrapper">
+                        <div class="custom-select-trigger" id="sightingTypeTrigger" onclick="toggleSightingTypeDropdown()">
+                            <span id="sightingTypeLabel">전체 유형</span>
+                            <span class="custom-select-arrow">▾</span>
+                        </div>
+                        <div class="custom-select-options" id="sightingTypeOptions">
+                            <div class="custom-select-option" data-value="" onclick="selectSightingType('')">
+                                <span class="option-text">전체 유형</span>
+                            </div>
+                            <div class="custom-select-option" data-value="곰 목격" onclick="selectSightingType('곰 목격')">
+                                <img class="option-icon" data-icon-key="곰 목격" src="" alt="">
+                                <span class="option-text">곰 목격</span>
+                            </div>
+                            <div class="custom-select-option" data-value="곰 흔적 확인" onclick="selectSightingType('곰 흔적 확인')">
+                                <img class="option-icon" data-icon-key="곰 흔적 확인" src="" alt="">
+                                <span class="option-text">곰 흔적 확인</span>
+                            </div>
+                            <div class="custom-select-option" data-value="곰 사살" onclick="selectSightingType('곰 사살')">
+                                <img class="option-icon" data-icon-key="곰 사살" src="" alt="">
+                                <span class="option-text">곰 사살</span>
+                            </div>
+                            <div class="custom-select-option" data-value="곰 가족 목격" onclick="selectSightingType('곰 가족 목격')">
+                                <img class="option-icon" data-icon-key="곰 가족 목격" src="" alt="">
+                                <span class="option-text">곰 가족 목격</span>
+                            </div>
+                            <div class="custom-select-option" data-value="곰 추정 목격" onclick="selectSightingType('곰 추정 목격')">
+                                <img class="option-icon" data-icon-key="곰 추정 목격" src="" alt="">
+                                <span class="option-text">곰 추정 목격</span>
+                            </div>
+                            <div class="custom-select-option" data-value="곰에 의한 사상" onclick="selectSightingType('곰에 의한 사상')">
+                                <img class="option-icon" data-icon-key="곰에 의한 사상" src="" alt="">
+                                <span class="option-text">곰에 의한 사상</span>
+                            </div>
+                        </div>
+                        <input type="hidden" id="sightingTypeFilter" value="">
+                    </div>
                 </div>
             </div>
         </div>
