@@ -380,9 +380,9 @@
                 <span data-lang="en" style="display:none;">Sapporo Bear Alert</span>
             </div>
             <div class="language-toggle">
-                <button class="lang-btn active" onclick="setLanguage('ko')">한국어</button>
-                <button class="lang-btn" onclick="setLanguage('ja')">日本語</button>
-                <button class="lang-btn" onclick="setLanguage('en')">English</button>
+                <button class="lang-btn active" data-lang="ko" onclick="setLanguage('ko')">한국어</button>
+                <button class="lang-btn" data-lang="ja" onclick="setLanguage('ja')">日本語</button>
+                <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">English</button>
             </div>
         </div>
     </header>
@@ -511,27 +511,13 @@
                 </label>
                 <div class="filter-group">
                     <select class="filter-select" id="sightingTypeFilter" onchange="applyFilters()">
-                        <option value="">
-                            <span data-ko="전체 유형" data-ja="全てのタイプ" data-en="All Types">전체 유형</span>
-                        </option>
-                        <option value="곰 목격">
-                            <span data-ko="🐻 곰 목격" data-ja="🐻 クマ目撃" data-en="🐻 Bear Sighting">🐻 곰 목격</span>
-                        </option>
-                        <option value="곰 흔적 확인">
-                            <span data-ko="👣 곰 흔적 확인" data-ja="👣 クマ痕跡確認" data-en="👣 Bear Tracks Found">👣 곰 흔적 확인</span>
-                        </option>
-                        <option value="곰 사살">
-                            <span data-ko="🔴 곰 사살" data-ja="🔴 クマ駆除" data-en="🔴 Bear Captured">🔴 곰 사살</span>
-                        </option>
-                        <option value="곰 가족 목격">
-                            <span data-ko="🐻🐻 곰 가족 목격" data-ja="🐻🐻 クマ親子目撃" data-en="🐻🐻 Bear Family Sighting">🐻🐻 곰 가족 목격</span>
-                        </option>
-                        <option value="곰 추정 목격">
-                            <span data-ko="⚫ 곰 추정 목격" data-ja="⚫ クマ可能性" data-en="⚫ Possible Bear Sighting">⚫ 곰 추정 목격</span>
-                        </option>
-                        <option value="곰에 의한 사상">
-                            <span data-ko="🤕 곰에 의한 사상" data-ja="🤕 クマによる人身事故" data-en="🤕 Bear Attack">🤕 곰에 의한 사상</span>
-                        </option>
+                        <option value="">전체 유형</option>
+                        <option value="곰 목격">🐻 곰 목격</option>
+                        <option value="곰 흔적 확인">👣 곰 흔적 확인</option>
+                        <option value="곰 사살">🔴 곰 사살</option>
+                        <option value="곰 가족 목격">🐻🐻 곰 가족 목격</option>
+                        <option value="곰 추정 목격">⚫ 곰 추정 목격</option>
+                        <option value="곰에 의한 사상">🤕 곰에 의한 사상</option>
                     </select>
                 </div>
             </div>
@@ -577,8 +563,7 @@
         <!-- Footer -->
         <div class="footer">
             <p style="font-size: 11px; line-height: 1.6; color: #6c757d; text-align: center;">
-                本ページは、札幌市が公開している ヒグマ出没情報（公開データ）を基に、個人が独自に整理・可視化したものです。<br>
-                内容は札幌市の公式見解を示すものではありません。
+                【札幌市】 公開 データを 基に 個人 作成。公式 情報は 札幌市 ホームページを ご確認ください
             </p>
         </div>
     </div>
